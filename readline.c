@@ -167,7 +167,7 @@ static char **lua_rl_complete(const char *text, int start, int end)
   ml.idx = ml.allocated = ml.matchlen = 0;
 
   savetop = lua_gettop(L);
-  lua_pushvalue(L, LUA_GLOBALSINDEX);
+  lua_pushglobal(L);
   for (n = (size_t)(end-start), i = dot = 0; i < n; i++)
     if (text[i] == '.' || text[i] == ':') {
       if (!lua_rl_getfield(L, text+dot, i-dot))
@@ -185,7 +185,7 @@ static char **lua_rl_complete(const char *text, int start, int end)
   loop = 0;  /* Avoid infinite metatable loops. */
   do {
     if (lua_istable(L, -1) &&
-  (loop == 0 || !lua_rawequal(L, -1, LUA_GLOBALSINDEX)))
+  (loop == 0 || !lua_rawequal(L, -1, LUA_RIDX_GLOBALS)))
       for (lua_pushnil(L); lua_next(L, -2); lua_pop(L, 1))
   if (lua_type(L, -2) == LUA_TSTRING) {
     s = lua_tostring(L, -2);
@@ -279,7 +279,7 @@ static int f_read_history(lua_State* L)
   return 0;
 }
 
-static const struct luaL_reg lib[] = {
+static const struct luaL_Reg lib[] = {
   {"readline", f_readline},
   {"add_history",f_add_history},
   {"write_history",f_write_history},
